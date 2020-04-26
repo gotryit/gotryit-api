@@ -1,0 +1,12 @@
+.vscode/launch.json
+.vscode/tasks.json
+obj/gotryit-api.csproj.nuget.dgspec.json
+obj/gotryit-api.csproj.nuget.g.props
+obj/gotryit-api.csproj.nuget.g.targets
+obj/project.assets.json
+obj/project.nuget.cache
+obj/Debug/netcoreapp3.1/gotryit-api.AssemblyInfo.cs
+obj/Debug/netcoreapp3.1/gotryit-api.AssemblyInfoInputs.cache
+obj/Debug/netcoreapp3.1/gotryit-api.assets.cache
+obj/Debug/netcoreapp3.1/gotryit-api.csprojAssemblyReference.cache
+obj/Debug/netcoreapp3.1/project.razor.json
