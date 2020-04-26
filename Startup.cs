@@ -36,6 +36,8 @@ namespace gotryit_api
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseHsts();
+
             app.UseHttpsRedirection();
 
             app.UseRouting();
