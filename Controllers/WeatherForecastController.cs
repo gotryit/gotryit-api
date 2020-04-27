@@ -23,6 +23,12 @@ namespace gotryit_api.Controllers
             _logger = logger;
         }
 
+        [HttpPost]
+        public IActionResult Post([FromBody] string token)
+        {
+            return Ok();
+        }
+
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {
@@ -34,6 +40,12 @@ namespace gotryit_api.Controllers
                 Summary = Summaries[rng.Next(Summaries.Length)]
             })
             .ToArray();
+        }
+
+        [HttpGet("db")]
+        public string GetDbString()
+        {
+            return Environment.GetEnvironmentVariable("DATABASE_URL");
         }
     }
 }
