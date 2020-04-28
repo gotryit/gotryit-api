@@ -1,15 +1,10 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace gotryit_api
 {
@@ -22,27 +17,39 @@ namespace gotryit_api
 
         public IConfiguration Configuration { get; }
 
+        private string Get(string valueName, Match match)
+        {
+            return match.Groups[valueName].Value.ToString();
+        }
+
+        private string GetPostgresConnection(string databaseUrl)
+        {
+            var connectionDataExtractor = @"^postgres:\/\/(?<user>\w+):(?<password>\w+)@(?<server>\S+):(?<port>\d+)\/(?<database>\w+)$";
+
+            var connectionData = Regex.Match(databaseUrl, connectionDataExtractor);
+
+            var result = $"Server={Get("server", connectionData)};Port={Get("port", connectionData)};User Id={Get("user", connectionData)};Password={Get("password", connectionData)};Database={Get("database", connectionData)}";
+
+            return result;
+        }
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
-        {
+        {            
+            var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+
             services.AddControllers();
+
+            services.AddEntityFrameworkNpgsql().AddDbContext<DbUsersContext>(options =>
+            {
+                options.UseNpgsql(GetPostgresConnection(databaseUrl));
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
-            app.UseHsts();
-
-            app.UseHttpsRedirection();
-
             app.UseRouting();
-
-            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

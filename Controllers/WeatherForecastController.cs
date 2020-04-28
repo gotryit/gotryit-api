@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace gotryit_api.Controllers
 {
@@ -16,19 +14,6 @@ namespace gotryit_api.Controllers
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
 
-        private readonly ILogger<WeatherForecastController> _logger;
-
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
-        {
-            _logger = logger;
-        }
-
-        [HttpPost]
-        public IActionResult Post([FromBody] string token)
-        {
-            return Ok();
-        }
-
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {
@@ -40,12 +25,6 @@ namespace gotryit_api.Controllers
                 Summary = Summaries[rng.Next(Summaries.Length)]
             })
             .ToArray();
-        }
-
-        [HttpGet("db")]
-        public string GetDbString()
-        {
-            return Environment.GetEnvironmentVariable("DATABASE_URL");
         }
     }
 }
