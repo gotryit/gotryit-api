@@ -5,9 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace gotryit_api.Controllers
 {
-    [ApiController]
-    [Route("[controller]")]
-    public class WeatherForecastController : ControllerBase
+    [Route("api/weather")]
+    public class WeatherForecastController : Controller
     {
         private static readonly string[] Summaries = new[]
         {

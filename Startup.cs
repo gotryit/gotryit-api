@@ -40,6 +40,10 @@ namespace gotryit_api
 
             services.AddControllers();
 
+            services.AddSwaggerGen(c => {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Weather API", Version = "v1" });
+            });
+
             services.AddEntityFrameworkNpgsql().AddDbContext<DbUsersContext>(options =>
             {
                 options.UseNpgsql(GetPostgresConnection(databaseUrl));
@@ -50,6 +54,11 @@ namespace gotryit_api
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseRouting();
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c => {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Weather API v1");
+            });
 
             app.UseEndpoints(endpoints =>
             {
