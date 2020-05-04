@@ -1,5 +1,6 @@
 using System;
 using System.Text.RegularExpressions;
+using gotryit_api.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -36,19 +37,28 @@ namespace gotryit_api
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
-        {            
+        {     
+
+
+        #if DEBUG
+            var connectionString = Configuration["Postgres:Connection"];
+        #else
+            //Heroku       
             var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+            var connectionString = GetPostgresConnection(databaseUrl);
+        #endif
 
             services.AddControllers();
 
             services.AddSwaggerGen(c => {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Weather API", Version = "v1" });
             });
-
-            services.AddEntityFrameworkNpgsql().AddDbContext<DbUsersContext>(options =>
+            
+            services.AddEntityFrameworkNpgsql().AddDbContext<GoTryItContext>(options =>
             {
-                options.UseNpgsql(GetPostgresConnection(databaseUrl));
+                options.UseNpgsql(connectionString);
             });
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
