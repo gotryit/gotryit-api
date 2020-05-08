@@ -54,7 +54,23 @@ PBKDF2: RFC2898
 
 Salt (random): RNGCryptoServiceProvider
 
+Sample code:
+```csharp
+    var password = "";
 
+    var salt = new byte[8];
+    new RNGCryptoServiceProvider().GetBytes(salt);
+
+    var keyDerivation = new Rfc2898DeriveBytes(Encoding.ASCII.GetBytes(password), salt, 10000);
+    var passwordHash256 = keyDerivation.GetBytes(32);
+
+    var newUser = new User(){
+	Active = false,
+	Name = "userName",
+	PasswordHash = Convert.ToBase64String(passwordHash256),
+	PasswordSalt = Convert.ToBase64String(salt)
+    };
+```
 
 ### Entity framework
 
