@@ -1,10 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
+using gotryit_api.Entities;
+using gotryit_api.Repositories;
+using System.Text;
+using System.Security.Cryptography;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 
 namespace gotryit_api.Controllers
 {
+    [Authorize]
     [Route("api/weather")]
     public class WeatherForecastController : Controller
     {
@@ -12,6 +22,12 @@ namespace gotryit_api.Controllers
         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
+        private readonly GoTryItContext db;
+
+        public WeatherForecastController(GoTryItContext db)
+        {
+            this.db = db;
+        }
 
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
@@ -25,5 +41,46 @@ namespace gotryit_api.Controllers
             })
             .ToArray();
         }
+
+        [AllowAnonymous]
+        [HttpPost("authenticate")]        
+        public AuthenticatedUser Authenticate([FromBody] AuthenticationData authenticationData)
+        {
+            var user = db.User.Single(u => u.Name == authenticationData.UserName);
+
+            var keyDerivation = new Rfc2898DeriveBytes(Encoding.ASCII.GetBytes(authenticationData.Password), 
+                                                       Convert.FromBase64String(user.PasswordSalt), 
+                                                       10000);
+
+            var computedHash = keyDerivation.GetBytes(32);
+
+            string userToken = string.Empty;
+
+            if (user.PasswordHash == Convert.ToBase64String(computedHash)) 
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = new byte[32];
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new Claim[] 
+                                {
+                                    new Claim(ClaimTypes.Name, authenticationData.UserName)
+                                }),
+                    Expires = DateTime.UtcNow.AddDays(7),
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                };
+                
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                
+                userToken = tokenHandler.WriteToken(token);
+            }
+
+            return new AuthenticatedUser(){
+                Token = userToken,
+                ExpireDate = DateTime.UtcNow.AddDays(7)
+            };
+        }
+
+
     }
 }

@@ -1,11 +1,13 @@
 using System;
 using System.Text.RegularExpressions;
 using gotryit_api.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 namespace gotryit_api
@@ -35,13 +37,13 @@ namespace gotryit_api
             return result;
         }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {     
 
 
         #if DEBUG
             var connectionString = Configuration["Postgres:Connection"];
+            var tokenKey = Convert.FromBase64String(Convert.ToBase64String(new byte[32]));// Configuration["Jwt:Key"]);
         #else
             //Heroku       
             var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
@@ -58,10 +60,26 @@ namespace gotryit_api
             {
                 options.UseNpgsql(connectionString);
             });
+
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(new byte[32]),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
             
         }
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseRouting();
@@ -70,6 +88,9 @@ namespace gotryit_api
             app.UseSwaggerUI(c => {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Weather API v1");
             });
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
