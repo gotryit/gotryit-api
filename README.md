@@ -56,20 +56,20 @@ Salt (random): RNGCryptoServiceProvider
 
 Sample code:
 ```csharp
-    var password = "";
+var password = "";
 
-    var salt = new byte[8];
-    new RNGCryptoServiceProvider().GetBytes(salt);
+var salt = new byte[8];
+new RNGCryptoServiceProvider().GetBytes(salt);
 
-    var keyDerivation = new Rfc2898DeriveBytes(Encoding.ASCII.GetBytes(password), salt, 10000);
-    var passwordHash256 = keyDerivation.GetBytes(32);
+var keyDerivation = new Rfc2898DeriveBytes(Encoding.ASCII.GetBytes(password), salt, 10000);
+var passwordHash256 = keyDerivation.GetBytes(32);
 
-    var newUser = new User(){
-	Active = false,
-	Name = "userName",
-	PasswordHash = Convert.ToBase64String(passwordHash256),
-	PasswordSalt = Convert.ToBase64String(salt)
-    };
+var newUser = new User(){
+    Active = false,
+    Name = "userName",
+    PasswordHash = Convert.ToBase64String(passwordHash256),
+    PasswordSalt = Convert.ToBase64String(salt)
+};
 ```
 
 ### Entity framework
@@ -136,9 +136,7 @@ public string GetToken()
                   new Claim(ClaimTypes.Name, UserName)
                   }),
   	Expires = DateTime.UtcNow.AddDays(7),
-  	SigningCredentials = new SigningCredentials(
-  														new SymmetricSecurityKey(key), 
-  														SecurityAlgorithms.HmacSha256Signature)
+  	SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
   };
   
   var token = tokenHandler.CreateToken(tokenDescriptor);
