@@ -110,7 +110,7 @@ namespace gotryit_api
             });
 
             services.AddCors(options => {
-                options.AddPolicy("allOrigins", builder => builder.AllowAnyOrigin());
+                options.AddPolicy("allOrigins", builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
             });
             
         }
