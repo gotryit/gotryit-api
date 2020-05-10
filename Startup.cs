@@ -108,11 +108,17 @@ namespace gotryit_api
                     ValidateAudience = false
                 };
             });
+
+            services.AddCors(options => {
+                options.AddPolicy("allOrigins", builder => builder.AllowAnyOrigin());
+            });
             
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseRouting();
+
+            app.UseCors("allOrigins");
 
             app.UseSwagger();
             app.UseSwaggerUI(c => {

@@ -14,7 +14,7 @@ using System.Security.Claims;
 
 namespace gotryit_api.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Administrator")]
     [Route("api/weather")]
     public class WeatherForecastController : Controller
     {
@@ -29,7 +29,7 @@ namespace gotryit_api.Controllers
             this.db = db;
         }
 
-        [HttpGet]
+        [HttpGet]        
         public IEnumerable<WeatherForecast> Get()
         {
             var rng = new Random();
@@ -64,7 +64,8 @@ namespace gotryit_api.Controllers
                 {
                     Subject = new ClaimsIdentity(new Claim[] 
                                 {
-                                    new Claim(ClaimTypes.Name, authenticationData.UserName)
+                                    new Claim(ClaimTypes.Name, authenticationData.UserName),
+                                    new Claim(ClaimTypes.Role, "Administrator")
                                 }),
                     Expires = DateTime.UtcNow.AddDays(7),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
