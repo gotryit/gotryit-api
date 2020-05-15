@@ -78,7 +78,8 @@ namespace gotryit_api.Controllers
 
             HttpContext.Response.Cookies.Append("UserAuthentication", userToken, new Microsoft.AspNetCore.Http.CookieOptions(){
                 Expires = DateTime.UtcNow.AddDays(7),
-                HttpOnly = true
+                HttpOnly = true,
+                Secure = true
             });
 
             return Ok();
