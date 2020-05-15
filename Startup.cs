@@ -125,6 +125,16 @@ namespace gotryit_api
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Weather API v1");
             });
 
+            app.Use(async (context, next) => {
+
+                if(context.Request.Cookies.ContainsKey("Auth_Key"))
+                {
+                    context.Request.Headers.Add("Authorization", $"Bearer {context.Request.Cookies["Auth_Key"]}");
+                }
+
+                await next();
+            });
+
             app.UseAuthentication();
             app.UseAuthorization();
 

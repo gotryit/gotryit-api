@@ -44,7 +44,7 @@ namespace gotryit_api.Controllers
 
         [AllowAnonymous]
         [HttpPost("authenticate")]        
-        public AuthenticatedUser Authenticate([FromBody] AuthenticationData authenticationData)
+        public IActionResult Authenticate([FromBody] AuthenticationData authenticationData)
         {
             var user = db.User.Single(u => u.Name == authenticationData.UserName);
 
@@ -76,10 +76,12 @@ namespace gotryit_api.Controllers
                 userToken = tokenHandler.WriteToken(token);
             }
 
-            return new AuthenticatedUser(){
-                Token = userToken,
-                ExpireDate = DateTime.UtcNow.AddDays(7)
-            };
+            HttpContext.Response.Cookies.Append("Auth_Key", userToken, new Microsoft.AspNetCore.Http.CookieOptions(){
+                Expires = DateTime.UtcNow.AddDays(7),
+                HttpOnly = true
+            });
+
+            return Ok();
         }
 
 
