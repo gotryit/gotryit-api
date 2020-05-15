@@ -76,7 +76,7 @@ namespace gotryit_api.Controllers
                 userToken = tokenHandler.WriteToken(token);
             }
 
-            HttpContext.Response.Cookies.Append("Auth_Key", userToken, new Microsoft.AspNetCore.Http.CookieOptions(){
+            HttpContext.Response.Cookies.Append("UserAuthentication", userToken, new Microsoft.AspNetCore.Http.CookieOptions(){
                 Expires = DateTime.UtcNow.AddDays(7),
                 HttpOnly = true
             });

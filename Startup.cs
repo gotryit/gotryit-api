@@ -127,9 +127,9 @@ namespace gotryit_api
 
             app.Use(async (context, next) => {
 
-                if(context.Request.Cookies.ContainsKey("Auth_Key"))
+                if(context.Request.Cookies.ContainsKey("UserAuthentication"))
                 {
-                    context.Request.Headers.Add("Authorization", $"Bearer {context.Request.Cookies["Auth_Key"]}");
+                    context.Request.Headers.Add("Authorization", $"Bearer {context.Request.Cookies["UserAuthentication"]}");
                 }
 
                 await next();
